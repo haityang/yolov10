@@ -13,7 +13,7 @@ int main(int argc, char **argv)
 {
     std::string projectBasePath = "/home/user/ultralytics"; // Set your ultralytics base path
 
-    bool runOnGPU = true;
+    bool runOnGPU = false;
 
     //
     // Pass in either:

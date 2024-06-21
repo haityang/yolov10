@@ -44,14 +44,15 @@ elseif (LINUX)
         set(ONNXRUNTIME_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/onnxruntime-linux-x64-${ONNXRUNTIME_VERSION}")
     endif ()
 elseif (APPLE)
-    set(ONNXRUNTIME_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/onnxruntime-osx-arm64-${ONNXRUNTIME_VERSION}")
+    set(ONNXRUNTIME_ROOT "/opt/homebrew/Cellar/onnxruntime/1.17.1")
+    # set(ONNXRUNTIME_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/onnxruntime-osx-arm64-${ONNXRUNTIME_VERSION}")
     # Apple X64 binary
     # set(ONNXRUNTIME_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/onnxruntime-osx-x64-${ONNXRUNTIME_VERSION}")
     # Apple Universal binary
     # set(ONNXRUNTIME_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/onnxruntime-osx-universal2-${ONNXRUNTIME_VERSION}")
 endif ()
 
-include_directories(${PROJECT_NAME} ${ONNXRUNTIME_ROOT}/include)
+include_directories(${PROJECT_NAME} ${ONNXRUNTIME_ROOT}/include/onnxruntime)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -88,7 +89,7 @@ endif ()
 configure_file(coco.yaml ${CMAKE_CURRENT_BINARY_DIR}/coco.yaml COPYONLY)
 
 # Copy yolov8n.onnx file to the same folder of the executable file
-configure_file(yolov8n.onnx ${CMAKE_CURRENT_BINARY_DIR}/yolov8n.onnx COPYONLY)
+configure_file(yolov10s.onnx ${CMAKE_CURRENT_BINARY_DIR}/yolov10s.onnx COPYONLY)
 
 # Create folder name images in the same folder of the executable file
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD

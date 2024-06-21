@@ -61,7 +61,7 @@ void Detector(YOLO_V8*& p) {
 void Classifier(YOLO_V8*& p)
 {
     std::filesystem::path current_path = std::filesystem::current_path();
-    std::filesystem::path imgs_path = current_path;// / "images"
+    std::filesystem::path imgs_path = current_path / "images";
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<int> dis(0, 255);
@@ -70,7 +70,7 @@ void Classifier(YOLO_V8*& p)
         if (i.path().extension() == ".jpg" || i.path().extension() == ".png")
         {
             std::string img_path = i.path().string();
-            //std::cout << img_path << std::endl;
+            std::cout << img_path << std::endl;
             cv::Mat img = cv::imread(img_path);
             std::vector<DL_RESULT> res;
             char* ret = p->RunSession(img, res);
@@ -89,7 +89,7 @@ void Classifier(YOLO_V8*& p)
             cv::imshow("TEST_CLS", img);
             cv::waitKey(0);
             cv::destroyAllWindows();
-            //cv::imwrite("E:\\output\\" + std::to_string(k) + ".png", img);
+            // cv::imwrite("E:\\output\\" + std::to_string(k) + ".png", img);
         }
 
     }
@@ -153,7 +153,7 @@ void DetectTest()
     DL_INIT_PARAM params;
     params.rectConfidenceThreshold = 0.1;
     params.iouThreshold = 0.5;
-    params.modelPath = "yolov8n.onnx";
+    params.modelPath = "yolov10s.onnx";
     params.imgSize = { 640, 640 };
 #ifdef USE_CUDA
     params.cudaEnable = true;
@@ -178,9 +178,9 @@ void DetectTest()
 void ClsTest()
 {
     YOLO_V8* yoloDetector = new YOLO_V8;
-    std::string model_path = "cls.onnx";
+    std::string model_path = "yolov10s.onnx";
     ReadCocoYaml(yoloDetector);
-    DL_INIT_PARAM params{ model_path, YOLO_CLS, {224, 224} };
+    DL_INIT_PARAM params{ model_path, YOLO_CLS };
     yoloDetector->CreateSession(params);
     Classifier(yoloDetector);
 }
@@ -188,6 +188,6 @@ void ClsTest()
 
 int main()
 {
-    //DetectTest();
-    ClsTest();
+    DetectTest();
+    // ClsTest();
 }
