@@ -50,13 +50,13 @@ class YOLOv8:
         """
 
         # Extract the coordinates of the bounding box
-        x1, y1, w, h = box
+        x1, y1, x2, y2 = box
 
         # Retrieve the color for the class ID
         color = self.color_palette[class_id]
 
         # Draw the bounding box on the image
-        cv2.rectangle(img, (int(x1), int(y1)), (int(x1 + w), int(y1 + h)), color, 2)
+        cv2.rectangle(img, (int(x1), int(y1)), (int( x2), int( y2)), color, 2)
 
         # Create the label text with class name and score
         label = f"{self.classes[class_id]}: {score:.2f}"
@@ -120,7 +120,8 @@ class YOLOv8:
         """
 
         # Transpose and squeeze the output to match the expected shape
-        outputs = np.transpose(np.squeeze(output[0]))
+        # outputs = np.transpose(np.squeeze(output[0]))
+        outputs = np.squeeze(output[0])
 
         # Get the number of rows in the outputs array
         rows = outputs.shape[0]
@@ -138,28 +139,29 @@ class YOLOv8:
         for i in range(rows):
             # Extract the class scores from the current row
             classes_scores = outputs[i][4:]
+            # print(classes_scores)
 
             # Find the maximum score among the class scores
-            max_score = np.amax(classes_scores)
+            max_score = classes_scores[0] #np.amax(classes_scores)
 
             # If the maximum score is above the confidence threshold
             if max_score >= self.confidence_thres:
                 # Get the class ID with the highest score
-                class_id = np.argmax(classes_scores)
+                class_id = int(classes_scores[1]) #np.argmax(classes_scores)
 
                 # Extract the bounding box coordinates from the current row
-                x, y, w, h = outputs[i][0], outputs[i][1], outputs[i][2], outputs[i][3]
+                x, y, x1, y1 = outputs[i][0], outputs[i][1], outputs[i][2], outputs[i][3]
 
                 # Calculate the scaled coordinates of the bounding box
-                left = int((x - w / 2) * x_factor)
-                top = int((y - h / 2) * y_factor)
-                width = int(w * x_factor)
-                height = int(h * y_factor)
+                left = int(x * x_factor)
+                top = int(y * y_factor)
+                right = int(x1 * x_factor)
+                bottom = int(y1 * y_factor)
 
                 # Add the class ID, score, and box coordinates to the respective lists
                 class_ids.append(class_id)
                 scores.append(max_score)
-                boxes.append([left, top, width, height])
+                boxes.append([left, top, right, bottom])
 
         # Apply non-maximum suppression to filter out overlapping bounding boxes
         indices = cv2.dnn.NMSBoxes(boxes, scores, self.confidence_thres, self.iou_thres)
@@ -208,7 +210,7 @@ class YOLOv8:
 if __name__ == "__main__":
     # Create an argument parser to handle command-line arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model", type=str, default="yolov8n.onnx", help="Input your ONNX model.")
+    parser.add_argument("--model", type=str, default=str(ASSETS / "yolov10s.onnx"), help="Input your ONNX model.")
     parser.add_argument("--img", type=str, default=str(ASSETS / "bus.jpg"), help="Path to input image.")
     parser.add_argument("--conf-thres", type=float, default=0.5, help="Confidence threshold")
     parser.add_argument("--iou-thres", type=float, default=0.5, help="NMS IoU threshold")

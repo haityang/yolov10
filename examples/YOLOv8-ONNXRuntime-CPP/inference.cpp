@@ -249,25 +249,27 @@ char* YOLO_V8::TensorProcess(clock_t& starttime_1, cv::Mat& iImg, N& blob, std::
         {
             float* classesScores = data + 4;
             cv::Mat scores(1, this->classes.size(), CV_32FC1, classesScores);
-            cv::Point class_id;
-            double maxClassScore;
-            cv::minMaxLoc(scores, 0, &maxClassScore, 0, &class_id);
+            // cv::Point class_id;
+            // double maxClassScore;
+            // cv::minMaxLoc(scores, 0, &maxClassScore, 0, &class_id);
+            double maxClassScore = classesScores[0];
+            double class_id = classesScores[1];
             if (maxClassScore > rectConfidenceThreshold)
             {
                 confidences.push_back(maxClassScore);
-                class_ids.push_back(class_id.x);
+                class_ids.push_back(class_id);//class_id.x
                 float x = data[0];
                 float y = data[1];
-                float w = data[2];
-                float h = data[3];
+                float x1 = data[2];
+                float y1 = data[3];
 
-                int left = int((x - 0.5 * w) * resizeScales);
-                int top = int((y - 0.5 * h) * resizeScales);
+                int left = int(x * resizeScales);
+                int top = int(y * resizeScales);
 
-                int width = int(w * resizeScales);
-                int height = int(h * resizeScales);
+                int right = int(x1 * resizeScales);
+                int bottom = int(y1 * resizeScales);
 
-                boxes.push_back(cv::Rect(left, top, width, height));
+                boxes.push_back(cv::Rect(left, top, right-left, bottom-top));
             }
             data += signalResultNum;
         }
